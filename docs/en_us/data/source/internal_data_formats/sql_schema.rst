@@ -754,7 +754,7 @@ module_type
      * - problemset
        - A collection of problems and supplementary materials, typically used for homeworks and rendered as a horizontal icon bar in the courseware. Use is inconsistent, and some courses use a ``sequential`` instead.
      * - randomize
-       - Identifies a problem in which one of several possible defined alternative problems is randomly selected for display to each student. 
+       - Identifies a module in which one of several possible defined alternatives is randomly selected for display to each student. 
      * - selfassessment
        - Self assessment problems. Used in a single course in Fall 2012 as an early test of the open ended grading system. Deprecated in favor of ``combinedopenended``. 
      * - sequential

@@ -12,9 +12,9 @@
 
   % if not disable_buttons:
     <p>${_("For smaller courses, profile information for enrolled students can be listed directly on this page:")}</p>
-    <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}"></p>
+    <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
   %endif
-    <div class="data-display-table" id="data-student-profiles-table"></div>
+  <div class="data-display-table" id="data-student-profiles-table"></div>
   
 
   <br>

@@ -11,14 +11,14 @@
   <p><input type="button" name="list-profiles" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
 
   % if not disable_buttons:
-    <p>${_("For smaller courses, the data can also be listed directly on this page.")}</p>
-    <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
+    <p>${_("For smaller courses, profile information for enrolled students can be listed directly on this page:")}</p>
+    <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}"></p>
   %endif
     <div class="data-display-table" id="data-student-profiles-table"></div>
   
 
   <br>
-  <p>${_("Displays the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
+  <p>${_("The following button displays the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
   <p><input type="button" name="dump-gradeconf" value="${_("Grading Configuration")}" data-endpoint="${ section_data['get_grading_config_url'] }"></p>
 
   <div class="data-display-text" id="data-grade-config-text"></div>

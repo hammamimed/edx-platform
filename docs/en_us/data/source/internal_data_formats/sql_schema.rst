@@ -108,7 +108,7 @@ The following tables store data gathered during site registration and course enr
 Columns in the auth_user Table
 ================================
 
-The ``auth_user`` table is built into the edX Django Web framework. It holds generic information necessary for basic login and permissions information. 
+The ``auth_user`` table is built into the edX Django Web framework. It holds generic information necessary for basic login and permissions. 
 
 A sample of the heading row and a data row in the ``auth_user`` table follow.
 
@@ -269,8 +269,7 @@ Obsolete columns
 Columns in the auth_userprofile Table
 ======================================
 
-The ``auth_userprofile`` table is mostly used to store user demographic information collected during the student registration process. It is also used to store certain additional metadata relating to certificates. 
-
+The ``auth_userprofile`` table is mostly used to store user demographic data collected during the student registration process. 
 Every row in this table corresponds to one row in ``auth_user``. 
 
 A sample of the heading row and a data row in the ``auth_userprofile`` table follow.
@@ -317,7 +316,7 @@ The ``auth_userprofile`` table has the following columns:
   | allow_certificate  | tinyint(1)   | NO   |     |                                          |
   +--------------------+--------------+------+-----+------------------------------------------+
 
-**History**: The organization of this table was different for the students who signed up for the MITx prototype phase in the spring of 2012, than for those who signed up afterwards. A significant difference exists in the demographic data gathered.
+**History**: The organization of this table was different for the students who signed up for the MITx prototype phase in the spring of 2012, than for those who signed up afterwards. The column descriptions that follow detail the differences in the demographic data gathered.
 
 ----
 id
@@ -513,7 +512,7 @@ level_of_education
        * - NULL
          - This student signed up before this information was collected.
 
-**History**: This information began to be collected after the transition from MITx to edX; prototype course students have NULL for this field.
+**History**: Data began to be collected in this column after the transition from MITx to edX; prototype course students have NULL for this field.
 
 -------
 goals
@@ -535,7 +534,9 @@ allow_certificate
 Columns in the student_courseenrollment Table
 ==============================================
 
-A row in this table represents a student's enrollment for a particular course run. If a student decides to unenroll from the course, ``is_active`` is set to ``False``. The student's state in ``courseware_studentmodule`` is untouched, so courseware state is not lost when a student unenrolls and then re-enrolls. 
+A row in this table represents a student's enrollment for a particular course run. If a student decides to unenroll from the course, ``is_active`` is set to 0 (false). The student's state in ``courseware_studentmodule`` is untouched, so courseware state is not lost if a student unenrolls and then re-enrolls. 
+
+note:: A row is created for every student who starts the enrollment process, even if they never complete registration. ``is_active`` is also set to 0 for these students.
 
 **History**: As of 20 Aug 2013, this table retains the records of students who unenroll. Records are no longer deleted from this table.
 
@@ -583,14 +584,14 @@ course_id
 ---------
 created
 ---------
-  Datetime of enrollment, UTC.
+  Stores the date and time that this row was created, in UTC format.
 
 -----------
 is_active
 -----------
   Boolean indicating whether this enrollment is active. If an enrollment is not active, a student is not enrolled in that course. This lets us unenroll students without losing a record of what courses they were enrolled in previously. 
 
-  This column was introduced in the 20 Aug 2013 release. Before this release, unenrolling a student simply deleted the row in ``student_courseenrollment``.
+  **History**: This column was introduced in the 20 Aug 2013 release. Before this release, unenrolling a student simply deleted the row in ``student_courseenrollment``.
 
 ------
 mode
@@ -667,7 +668,7 @@ About Modules
 
 It's important to understand what "modules" are in the context of our system, as the terminology can be confusing. For the conventions of this table and many parts of our code, a "module" is a content piece that appears in the courseware. This can be nearly anything that appears when users are in the courseware tab: a video, a piece of HTML, a problem, etc. Modules can also be collections of other modules, such as sequences, verticals (modules stacked together on the same page), weeks, chapters, etc. In fact, the course itself is a top level module that contains all the other contents of the course as children. You can imagine the entire course as a tree with modules at every node.
 
-Modules can store state, but whether and how they do so is up to the implemenation for that particular kind of module. When a user loads a page, the system looks up all the modules that need to be rendered in order to display it, and then asks the database to look up state for those modules for that user. If there is a corresponding entry for that user for a given module, a new row is created and the state is set to an empty JSON dictionary.
+Modules can store state, but whether and how they do so is up to the implementation for that particular kind of module. When a user loads a page, the system looks up all the modules that need to be rendered in order to display it, and then asks the database to look up state for those modules for that user. If there is a corresponding entry for that user for a given module, a new row is created and the state is set to an empty JSON dictionary.
 
 .. _courseware_studentmodule:
 
@@ -687,7 +688,7 @@ A sample of the heading row and a data row in the ``courseware_studentmodule`` t
     33973858  course  i4x://edX/DemoX/course/Demo_course  96452 {"position": 3} NULL  
     2013-03-19 17:21:07 2014-01-07 20:18:54 NULL  na  edX/DemoX/Demo_course
 
-Every student has a separate row for every piece of content in the course, making this by far our largest table. 
+Students have a separate row for every piece of content that they access or that is created to hold state data, making this the largest table in the data package. 
 
 
 The ``courseware_studentmodule`` table has the following columns:
@@ -746,7 +747,7 @@ module_type
      * - lti
        - Learning Tools Interoperability component that adds an external learning application to display content, or to display content and also require a student response. 
      * - peergrading
-       - Indicates a problem that is graded by other students. 
+       - Indicates a problem that is graded by other students. An option for grading open ended questions.
      * - poll_question
        - Not currently used. **History**: This ``module_type`` was included in a single course on a test basis and then deprecated. 
      * - problem
@@ -856,7 +857,9 @@ grade
 ---------
 created
 ---------
-  Datetime when this row was created (that is, when the student first accessed this piece of content).
+  Datetime when this row was created, which is typically when the student first accesses this piece of content.
+
+note:: For a module that contains multiple child modules, a row is created for each of them when the student first accesses one of them.
 
 ----------
 modified
@@ -894,7 +897,9 @@ Certificate Data
 Columns in the certificates_generatedcertificate Table
 =======================================================
 
-The ``certificates_generatedcertificate`` table tracks certificate state for students who have been graded after a course completes. Currently the table is only populated when a course ends and a script is run to grade students who have completed the course.
+tracks certificate state for students who have been graded after a course completes. Currently a course ends and a script is run to grade students who have completed the course.
+
+The ``certificates_generatedcertificate`` table tracks the state of certificates and final grades for a course. The table is  populated when a script is run to grade all of the students who are enrolled in the course at the time and issue certificates. The  certificate process can be rerun and this table is updated appropriately.
 
 A sample of the heading row and two data rows in the ``certificates_generatedcertificate`` table follow.
 
@@ -965,7 +970,7 @@ download_url
 -------
 grade
 -------
-  The grade of the student recorded at the time the certificate was generated. This may be different than the current grade since grading is only done once for a course when it ends.
+  The grade computed the last time certificate generation ran. If the courseware, student state, or grading policy change, the value in this column can be different than the grade shown on a student's Progress page.
 
 ---------
 key
@@ -1005,7 +1010,7 @@ status
        * - regenerating 
          - A request has been made to regenerate a certificate but it has not yet been generated.
        * - restricted 
-         - ``userprofile.allow_certificate`` is false: the student is on the restricted embargo list. 
+         - No longer used. **History**: Specified when ``userprofile.allow_certificate`` was set to false: to indicate that the student was on the restricted embargo list. 
        * - unavailable 
          - No entry, typically because the student has not yet been graded for certificate generation.
 
@@ -1013,7 +1018,6 @@ status
 
   * downloadable
   * notpassing
-  * restricted
 
 -------------
 verify_uuid

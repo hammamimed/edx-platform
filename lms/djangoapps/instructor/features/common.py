@@ -99,5 +99,10 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
 
         world.css_click('input[name="list-profiles"]')
 
+    elif button == "Download profile information as a CSV":
+        # Go to the data download section of the instructor dash
+        go_to_section("data_download")
+        # Don't do anything else, next step will handle clicking & downloading
+
     else:
         raise ValueError("Unrecognized button option " + button)

@@ -17,6 +17,15 @@ Feature: LMS.Instructor Dash Data Download
        | instructor    |
        | staff         |
 
+    Scenario: Download enrolled students' profile information
+       Given I am "<Role>" for a course
+       When I click "Download profile information as a CSV"
+       Then I download a CSV of student profile information
+       Examples:
+       | Role          |
+       | instructor    |
+       | staff         |
+
     Scenario: View the grading configuration
        Given I am "<Role>" for a course
        When I click "Grading Configuration"

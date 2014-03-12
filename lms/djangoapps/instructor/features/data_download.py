@@ -9,6 +9,7 @@ acceptance tests.
 from lettuce import world, step
 from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=E0611
 from terrain.steps import reload_the_page
+from splinter.request_handler.request_handler import RequestHandler
 
 
 @step(u'I see a table of student profiles')
@@ -37,6 +38,17 @@ def find_student_profile_table(step):  # pylint: disable=unused-argument
         ]
     for datum in expected_data:
         assert_in(datum, world.css_text('#data-student-profiles-table'))
+
+
+@step(u"I download a CSV of student profile information")
+def download_profile_csv_info(step):  # pylint: disable=unused-argument
+    world.wait_for_ajax_complete()
+    request = RequestHandler()
+    DOWNLOAD_BUTTON = world.css_find('input[name="list-profiles-csv"]')
+    url = DOWNLOAD_BUTTON['href']
+    request.connect(url)
+
+    return request.status_code.is_success()
 
 
 @step(u"I see the grading configuration for the course")
